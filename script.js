@@ -31,16 +31,8 @@ const els = {
   customersBar: document.getElementById("customers-bar"),
 };
 
-const CURRENCY_CODES = {
-  $: "USD",
-  "\u20ac": "EUR",
-};
-
 function formatCurrency(amount) {
-  return new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: CURRENCY_CODES[state.currency],
-  }).format(amount);
+  return `${state.currency}${Math.round(amount).toLocaleString()}`;
 }
 
 // Formula 01: Customers = Total Revenue / Average Order Value
@@ -62,7 +54,7 @@ function calculateProspects(leads) {
 }
 
 function updateSummaryCard(valueEl, percentEl, barEl, value, percent) {
-  valueEl.textContent = formatCurrency(value);
+  valueEl.textContent = Math.round(value).toLocaleString();
   percentEl.textContent = `${percent.toFixed(0)}%`;
   barEl.style.width = `${Math.min(percent, 100)}%`;
 }
