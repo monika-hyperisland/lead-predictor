@@ -79,6 +79,126 @@ function render() {
     customers,
     prospects ? (customers / prospects) * 100 : 0
   );
+
+  drawChart(buildMonthlyData(prospects, leads, customers));
+}
+
+const chart = {
+  canvas: document.getElementById("funnel-chart"),
+  tooltip: document.getElementById("chart-tooltip"),
+  bars: [],
+};
+chart.ctx = chart.canvas.getContext("2d");
+
+function monthsBetween(startStr, endStr) {
+  if (!startStr || !endStr) return 6;
+  const start = new Date(startStr);
+  const end = new Date(endStr);
+  const months =
+    (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+  return Math.max(1, months);
+}
+
+// Builds a cumulative ramp of totals per month, ending at the final target values
+function buildMonthlyData(prospects, leads, customers) {
+  const monthCount = monthsBetween(state.campaignStart, state.campaignEnd);
+  const data = [];
+  for (let m = 1; m <= monthCount; m++) {
+    const progress = m / monthCount;
+    data.push({
+      month: m,
+      prospects: prospects * progress,
+      leads: leads * progress,
+      customers: customers * progress,
+    });
+  }
+  return data;
+}
+
+function resizeCanvas() {
+  const rect = chart.canvas.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  chart.canvas.width = rect.width * dpr;
+  chart.canvas.height = rect.height * dpr;
+  chart.canvas.style.width = `${rect.width}px`;
+  chart.canvas.style.height = `${rect.height}px`;
+  chart.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function drawChart(data) {
+  resizeCanvas();
+  const ctx = chart.ctx;
+  const width = chart.canvas.clientWidth;
+  const height = chart.canvas.clientHeight;
+  ctx.clearRect(0, 0, width, height);
+
+  const maxValue = Math.max(1, ...data.map((d) => d.prospects));
+  const padding = { top: 20, right: 20, bottom: 30, left: 20 };
+  const plotHeight = height - padding.top - padding.bottom;
+  const plotWidth = width - padding.left - padding.right;
+  const gap = 12;
+  const barWidth = plotWidth / data.length - gap;
+
+  chart.bars = data.map((d, i) => {
+    const x = padding.left + i * (barWidth + gap);
+    const prospectsH = (d.prospects / maxValue) * plotHeight;
+    const leadsH = (d.leads / maxValue) * plotHeight;
+    const customersH = (d.customers / maxValue) * plotHeight;
+    const baseY = padding.top + plotHeight;
+
+    ctx.fillStyle = getComputedStyle(document.documentElement)
+      .getPropertyValue("--bar-prospects")
+      .trim();
+    ctx.fillRect(x, baseY - prospectsH, barWidth, prospectsH);
+
+    ctx.fillStyle = getComputedStyle(document.documentElement)
+      .getPropertyValue("--bar-leads")
+      .trim();
+    ctx.fillRect(x, baseY - leadsH, barWidth, leadsH);
+
+    ctx.fillStyle = getComputedStyle(document.documentElement)
+      .getPropertyValue("--bar-customers")
+      .trim();
+    ctx.fillRect(x, baseY - customersH, barWidth, customersH);
+
+    ctx.fillStyle = "#8b96ab";
+    ctx.font = "11px Segoe UI";
+    ctx.textAlign = "center";
+    ctx.fillText(`M${d.month}`, x + barWidth / 2, height - 8);
+
+    return { x, y: padding.top, width: barWidth, height: plotHeight, data: d };
+  });
+}
+
+function bindChartTooltip() {
+  chart.canvas.addEventListener("mousemove", (e) => {
+    const rect = chart.canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const bar = chart.bars.find(
+      (b) => mx >= b.x && mx <= b.x + b.width && my >= b.y && my <= b.y + b.height
+    );
+
+    if (!bar) {
+      chart.tooltip.classList.add("hidden");
+      return;
+    }
+
+    chart.tooltip.innerHTML =
+      `Month #${bar.data.month}<br>` +
+      `Prospects: ${Math.round(bar.data.prospects).toLocaleString()}<br>` +
+      `Leads: ${Math.round(bar.data.leads).toLocaleString()}<br>` +
+      `Customers: ${Math.round(bar.data.customers).toLocaleString()}`;
+    chart.tooltip.style.left = `${e.clientX - rect.left + 12}px`;
+    chart.tooltip.style.top = `${e.clientY - rect.top + 12}px`;
+    chart.tooltip.classList.remove("hidden");
+  });
+
+  chart.canvas.addEventListener("mouseleave", () => {
+    chart.tooltip.classList.add("hidden");
+  });
+
+  window.addEventListener("resize", () => render());
 }
 
 function setDefaultDates() {
@@ -141,6 +261,7 @@ function init() {
   els.prospectResponseRateValue.textContent = `${state.prospectResponseRate.toFixed(2)}%`;
   setDefaultDates();
   bindInputs();
+  bindChartTooltip();
   render();
 }
 
