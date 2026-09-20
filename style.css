@@ -187,3 +187,22 @@ body {
   text-align: right;
   color: var(--text-main);
 }
+
+@media (max-width: 800px) {
+  .app-body {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .slider-field {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+
+  .slider-value {
+    text-align: left;
+  }
+}
