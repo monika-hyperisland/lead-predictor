@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lead Predictor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <span class="logo-icon">&#9661;</span>
+      <h1>Lead<span>Predictor</span></h1>
+    </header>
+
+    <div class="app-body">
+      <aside class="sidebar">
+        <div class="field">
+          <label for="language">Language</label>
+          <select id="language">
+            <option>English</option>
+            <option>Bulgarian</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="$">$ US Dollar</option>
+            <option value="&#8364;">&#8364; Euro</option>
+            <option value="&#8206;лв">лв Bulgarian Lev</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="campaign-start">Campaign Start</label>
+          <input type="date" id="campaign-start" />
+        </div>
+
+        <div class="field">
+          <label for="campaign-end">Campaign End</label>
+          <input type="date" id="campaign-end" />
+        </div>
+
+        <div class="field">
+          <label for="total-revenue">Total Revenue</label>
+          <input type="number" id="total-revenue" min="0" step="1" />
+        </div>
+
+        <div class="field">
+          <label for="avg-order-value">Avg. Order Value</label>
+          <input type="number" id="avg-order-value" min="1" step="1" />
+        </div>
+      </aside>
+
+      <main class="dashboard">
+        <section class="chart-panel">
+          <canvas id="funnel-chart"></canvas>
+          <div id="chart-tooltip" class="chart-tooltip hidden"></div>
+        </section>
+
+        <section class="summary-panel">
+          <article class="summary-card" id="card-prospects">
+            <div class="summary-card-head">
+              <span class="summary-icon">&#128100;</span>
+              <span class="summary-label">Prospects</span>
+              <span class="summary-percent" id="prospects-percent">100%</span>
+            </div>
+            <div class="summary-value" id="prospects-value">0</div>
+            <div class="summary-bar"><div class="summary-bar-fill" id="prospects-bar"></div></div>
+          </article>
+
+          <article class="summary-card" id="card-leads">
+            <div class="summary-card-head">
+              <span class="summary-icon">&#128101;</span>
+              <span class="summary-label">Leads</span>
+              <span class="summary-percent" id="leads-percent">0%</span>
+            </div>
+            <div class="summary-value" id="leads-value">0</div>
+            <div class="summary-bar"><div class="summary-bar-fill" id="leads-bar"></div></div>
+          </article>
+
+          <article class="summary-card" id="card-customers">
+            <div class="summary-card-head">
+              <span class="summary-icon">&#127942;</span>
+              <span class="summary-label">Customers</span>
+              <span class="summary-percent" id="customers-percent">0%</span>
+            </div>
+            <div class="summary-value" id="customers-value">0</div>
+            <div class="summary-bar"><div class="summary-bar-fill" id="customers-bar"></div></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <section class="sliders-panel">
+      <div class="slider-field">
+        <label for="lead-response-rate">Lead Response Rate</label>
+        <input type="range" id="lead-response-rate" min="1" max="100" step="0.5" />
+        <span class="slider-value" id="lead-response-rate-value">0%</span>
+      </div>
+
+      <div class="slider-field">
+        <label for="prospect-response-rate">Prospect Response Rate</label>
+        <input type="range" id="prospect-response-rate" min="1" max="100" step="0.5" />
+        <span class="slider-value" id="prospect-response-rate-value">0%</span>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
