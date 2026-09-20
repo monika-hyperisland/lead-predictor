@@ -17,4 +17,5 @@ Just open `index.html` in a browser
 ## Deployment
 
 The app is a static site (HTML/CSS/JS, no build step) and is deployed to
-Netlify.
+Netlify. Configuration lives in `netlify.toml` (publishes the repo root,
+no build command required).
